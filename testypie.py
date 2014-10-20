@@ -1,6 +1,9 @@
 from flask import Flask, request, Response
 import os
-import urllib
+try:
+    from urllib.urlparse import quote
+except ImportError:
+    from urllib import quote
 import requests
 import json
 import logging
@@ -15,7 +18,7 @@ BASEDIR = 'fixtures'
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-    cache_file_name = os.path.join(BASEDIR, urllib.quote(request.url, ''))
+    cache_file_name = os.path.join(BASEDIR, quote(request.url, ''))
 
     if not os.path.exists(BASEDIR):
         os.makedirs(BASEDIR)
