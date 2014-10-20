@@ -1,7 +1,7 @@
 from flask import Flask, request, Response
 import os
 try:
-    from urllib.urlparse import quote
+    from urllib.parse import quote
 except ImportError:
     from urllib import quote
 import requests
