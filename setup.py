@@ -4,10 +4,10 @@ from distutils.core import setup
 
 
 setup(name='testypie',
-      version = '0.0.0',
+      version = '0.0.1',
       author = 'Ross Fenning',
       author_email = 'ross.fenning@gmail.com',
-      url = 'http://gitub.com/avengerpenguin/testypie',
+      url = 'http://github.com/avengerpenguin/testypie',
       description = 'HTTP proxy that generates and loads from fixtures for testing.',
       license = 'GPLv3+',
       classifiers = [
