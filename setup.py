@@ -4,7 +4,7 @@ from distutils.core import setup
 
 
 setup(name='testypie',
-      version='0.3.0',
+      version='0.3.1',
       author='Ross Fenning',
       author_email='ross.fenning@gmail.com',
       py_modules=['testypie'],
