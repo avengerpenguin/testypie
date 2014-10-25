@@ -6,6 +6,7 @@ try:
     from urllib.parse import quote
 except ImportError:
     from urllib import quote
+from httplib2 import iri2uri
 
 
 app = Flask(__name__)
@@ -15,7 +16,7 @@ BASEDIR = 'fixtures'
 
 
 def url_to_filename(url):
-    return quote(url, safe='')
+    return quote(iri2uri(url), safe='')
 
 
 class Cache(object):
