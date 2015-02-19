@@ -1,6 +1,7 @@
 import json
 import os
 from flask import Flask, request, Response
+import logging
 import requests
 try:
     from urllib.parse import quote
@@ -35,6 +36,7 @@ class Cache(object):
 
         with open(filename, 'w') as cache_file:
             cache_file.write(json.dumps(value, indent=4))
+            logging.info('Wrote to: {}', filename)
 
     def __getitem__(self, item):
         filename = os.path.join(self.basedir, url_to_filename(item))
@@ -52,33 +54,42 @@ def create_incoming_headers(upstream_response):
     return server_headers
 
 
-def create_outgoing_headers():
+def create_outgoing_headers(headers):
     client_headers = {
-        'Accept': request.headers['Accept']
+        'Accept': headers['Accept']
     }
     return client_headers
+
+
+CACHE = Cache(BASEDIR)
+
+
+def get_response(url, headers):
+
+    if url not in CACHE:
+        # Use requests to fetch the upstream URL the client wants
+        outgoing_headers = create_outgoing_headers(headers)
+        upstream = requests.get(url,
+                                allow_redirects=False,
+                                headers=outgoing_headers)
+
+        response_headers = create_incoming_headers(upstream)
+        response = dict(code=upstream.status_code,
+                        body=upstream.content.decode('utf-8'),
+                        headers=response_headers)
+
+        CACHE[url] = response
+
+    return CACHE[url]
 
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-
-    cache = Cache(BASEDIR)
-
-    if request.url not in cache:
-
-        # Use requests to fetch the upstream URL the client wants
-        outgoing_headers = create_outgoing_headers()
-        upstream = requests.get(request.url, allow_redirects=False, headers=outgoing_headers)
-
-        response_headers = create_incoming_headers(upstream)
-        response = dict(code=upstream.status_code, body=upstream.content.decode('utf-8'), headers=response_headers)
-
-        cache[request.url] = response
-
-    response = cache[request.url]
-    return Response(response=response['body'].encode('utf-8'), status=response['code'], headers=response['headers'])
-
+    response = get_response(request.url, request.headers)
+    return Response(response=response['body'].encode('utf-8'),
+                    status=response['code'],
+                    headers=response['headers'])
 
 
 if __name__ == "__main__":
