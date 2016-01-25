@@ -48,16 +48,17 @@ class Cache(object):
 
 def create_incoming_headers(upstream_response):
     server_headers = {}
-    for wanted_header in {'Content-Type', 'Location'}:
+    for wanted_header in {'Content-Type', 'Location', 'Server'}:
         if wanted_header in upstream_response.headers:
             server_headers[wanted_header] = upstream_response.headers[wanted_header]
     return server_headers
 
 
 def create_outgoing_headers(headers):
-    client_headers = {
-        'Accept': headers['Accept']
-    }
+    client_headers = {}
+    for wanted_header in {'Accept'}:
+        if wanted_header in headers:
+            client_headers[wanted_header] = headers[wanted_header]
     return client_headers
 
 
