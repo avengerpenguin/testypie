@@ -63,6 +63,7 @@ def create_outgoing_headers(headers):
 
 
 CACHE = Cache(BASEDIR)
+HTTP = requests.Session()
 
 
 def get_response(url, headers):
@@ -70,9 +71,9 @@ def get_response(url, headers):
     if url not in CACHE:
         # Use requests to fetch the upstream URL the client wants
         outgoing_headers = create_outgoing_headers(headers)
-        upstream = requests.get(url,
-                                allow_redirects=False,
-                                headers=outgoing_headers)
+        upstream = HTTP.get(url,
+                            allow_redirects=False,
+                            headers=outgoing_headers)
 
         response_headers = create_incoming_headers(upstream)
         response = dict(code=upstream.status_code,
