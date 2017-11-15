@@ -4,7 +4,7 @@ from distutils.core import setup
 
 
 setup(name='testypie',
-      version='0.5.0',
+      version='0.6.0',
       author='Ross Fenning',
       author_email='ross.fenning@gmail.com',
       py_modules=['testypie'],
@@ -18,6 +18,7 @@ setup(name='testypie',
       ],
       install_requires=[
           'Flask',
-          'requests'
+          'requests',
+          'httplib2'
       ],
 )
