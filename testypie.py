@@ -1,4 +1,6 @@
-import json
+import hashlib
+
+import yaml
 import os
 from flask import Flask, request, Response
 import logging
@@ -17,7 +19,18 @@ BASEDIR = 'fixtures'
 
 
 def url_to_filename(url):
-    return quote(iri2uri(url), safe='')
+    return quote(iri2uri(url), safe='') + '.yaml'
+
+
+class literal(str):
+    pass
+
+
+def literal_presenter(dumper, data):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+
+
+yaml.add_representer(literal, literal_presenter)
 
 
 class Cache(object):
@@ -35,14 +48,19 @@ class Cache(object):
             os.makedirs(os.path.dirname(filename))
 
         with open(filename, 'w') as cache_file:
-            cache_file.write(json.dumps(value, indent=4))
+            value['body'] = literal(value['body'])
+            if 'request_body' in value:
+                value['request_body'] = literal(value['request_body'])
+
+            yaml.dump(value, cache_file, default_flow_style=False)
             logging.info('Wrote to: {}', filename)
 
     def __getitem__(self, item):
         filename = os.path.join(self.basedir, url_to_filename(item))
 
         with open(filename, 'r') as cache_file:
-            value = json.loads(cache_file.read())
+            value = yaml.safe_load(cache_file)
+
         return value
 
 
@@ -56,7 +74,7 @@ def create_incoming_headers(upstream_response):
 
 def create_outgoing_headers(headers):
     client_headers = {}
-    for wanted_header in {'Accept'}:
+    for wanted_header in {'Accept', 'Content-Type', 'X-Amz-Date', 'X-Amz-Security-Token', 'User-Agent', 'Content-Length', 'Authorization'}:
         if wanted_header in headers:
             client_headers[wanted_header] = headers[wanted_header]
     return client_headers
@@ -66,29 +84,41 @@ CACHE = Cache(BASEDIR)
 HTTP = requests.Session()
 
 
-def get_response(url, headers):
+def get_response(url, headers, method='get', body=None):
 
-    if url not in CACHE:
+    cache_key = '{}-{}'.format(method.upper(), url)
+    if body:
+        cache_key += '-' + hashlib.md5(body).hexdigest()
+
+    if cache_key not in CACHE:
         # Use requests to fetch the upstream URL the client wants
         outgoing_headers = create_outgoing_headers(headers)
-        upstream = HTTP.get(url,
-                            allow_redirects=False,
-                            headers=outgoing_headers)
+
+        upstream = HTTP.request(
+            method,
+            url,
+            allow_redirects=False,
+            headers=outgoing_headers,
+            data=body,
+        )
 
         response_headers = create_incoming_headers(upstream)
         response = dict(code=upstream.status_code,
                         body=upstream.content.decode('utf-8'),
                         headers=response_headers)
 
-        CACHE[url] = response
+        if body:
+            response['request_body'] = body.decode('utf-8')
 
-    return CACHE[url]
+        CACHE[cache_key] = response
+
+    return CACHE[cache_key]
 
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-    response = get_response(request.url, request.headers)
+    response = get_response(request.url, request.headers, method=request.method)
     return Response(response=response['body'].encode('utf-8'),
                     status=response['code'],
                     headers=response['headers'])
