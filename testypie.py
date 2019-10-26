@@ -1,4 +1,5 @@
 import hashlib
+import sys
 
 import yaml
 import os
@@ -10,6 +11,7 @@ try:
 except ImportError:
     from urllib import quote
 from httplib2 import iri2uri
+from clize import run
 
 
 app = Flask(__name__)
@@ -59,6 +61,7 @@ class Cache(object):
         filename = os.path.join(self.basedir, url_to_filename(item))
 
         with open(filename, 'r') as cache_file:
+            print(f'Writing to {filename}', file=sys.stderr)
             value = yaml.safe_load(cache_file)
 
         return value
@@ -124,5 +127,13 @@ def proxy(path):
                     headers=response['headers'])
 
 
+def run_app(host=None, port=None):
+    app.run(host=host, port=port)
+
+
+def cli():
+    run(run_app)
+
+
 if __name__ == "__main__":
-    app.run()
+    cli()
