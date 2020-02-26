@@ -1,13 +1,14 @@
 FROM python:3.7
 
-ADD setup.py /code/setup.py
-ADD testypie.py /code/testypie.py
-
-RUN pip install /code
-
-EXPOSE 5000
+ADD . /code
 
 WORKDIR /code
 
-CMD testypie 0.0.0.0 5000
+RUN python setup.py sdist
 
+RUN pip install dist/*
+
+EXPOSE 5000
+
+ENV PYTHONPATH=/code
+CMD testypie 0.0.0.0 5000
