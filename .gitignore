@@ -6,3 +6,9 @@
 *~
 /venv
 _version.py
+.eggs
+pip-wheel-metadata
+node_modules
+*.egg-info
+__pycache__
+*.pem
