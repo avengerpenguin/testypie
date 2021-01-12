@@ -1,11 +1,13 @@
 import hashlib
 import logging
 import os
+import ssl
 import sys
 
 import requests
 import yaml
-from clize import run
+import typer
+from certauth.certauth import CertificateAuthority
 from flask import Flask
 from flask import Response
 from flask import request
@@ -16,9 +18,7 @@ try:
 except ImportError:
     from urllib import quote
 
-
 app = Flask(__name__)
-
 
 BASEDIR = "fixtures"
 
@@ -101,7 +101,6 @@ HTTP = requests.Session()
 
 
 def get_response(url, headers, method="get", body=None):
-
     cache_key = "{}-{}".format(method.upper(), url)
     if body:
         cache_key += "-" + hashlib.md5(body).hexdigest()
@@ -146,12 +145,32 @@ def proxy(path):
     )
 
 
-def run_app(host=None, port=None):
-    app.run(host=host, port=port)
+def run_app(
+    host: str = None,
+    port: int = None,
+    https_host: str = None,
+    wildcard: bool = False,
+):
+    if https_host:
+        ca = CertificateAuthority(
+            "Testypie Temporary Test CA",
+            "/tmp/testypie/ca.pem",
+            cert_cache="/tmp/testypie",
+        )
+        print(f"Created CA file at /tmp/testypie/ca.pem")
+        print(
+            f"Configure your app (temporarily) to use this CA to verify upstream requests to {https_host}"
+        )
+        filename = ca.cert_for_host(https_host, wildcard=wildcard)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(filename)
+    else:
+        context = None
+    app.run(host=host, port=port, ssl_context=context)
 
 
 def cli():
-    run(run_app)
+    typer.run(run_app)
 
 
 if __name__ == "__main__":

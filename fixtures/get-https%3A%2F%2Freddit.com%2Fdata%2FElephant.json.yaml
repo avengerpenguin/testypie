@@ -1,0 +1,5 @@
+body: ""
+code: 301
+headers:
+  Location: https://www.reddit.com/data/Elephant.json
+  Server: snooserv

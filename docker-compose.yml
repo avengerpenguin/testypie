@@ -8,17 +8,32 @@ services:
       - ./fixtures:/code/fixtures
     networks:
       - testypie
+  testypies:
+    build:
+      context: .
+      dockerfile: Dockerfile.testypie
+    command: testypie --host 0.0.0.0 --port 5000 --https-host reddit.com
+    volumes:
+      - ./fixtures:/code/fixtures
+      - /tmp/testypie:/tmp/testypie
+    networks:
+      - testypie
   mocha:
     build:
       context: .
       dockerfile: Dockerfile.mocha
     environment:
       - GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE=
-      - HTTP_PROXY=http://testypie:5000
+      - HTTPS_PROXY=https://testypies:5000
+      - HTTP_PROXY=http://testypies:5000
+      - ROARR_LOG=true
+    volumes:
+      - /tmp/testypie:/tmp/testypie
     networks:
       - testypie
     links:
       - testypie
+      - testypies
 
 networks:
   testypie:

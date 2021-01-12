@@ -1,36 +1,38 @@
 const http = require('http');
-const globalAgent = require('global-agent');
-globalAgent.bootstrap();
+const https = require('https');
+const axios = require('axios');
+const assert = require('assert');
 
+const agentOptions = {
+    host: 'locahost',
+    port: '5000',
+    path: '/',
+    rejectUnauthorized: false,
+  }
+const agent = new https.Agent(agentOptions)
 
-function exampleFunctionNeedingTesting(callback) {
-  return new Promise(function(resolve, reject) {
-    http.get('http://dbpedia.org/data/Elephant.json', (resp) => {
-      let data = '';
-
-      // A chunk of data has been recieved.
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      // The whole response has been received. Print out the result.
-      resp.on('end', () => {
-        resolve(data.length);
-      });
-
-    }).on("error", (error) => {
-      reject(error)
-    });
-  });
+function keyCounter(url) {
+  return axios.get({
+    url,
+    responseType: 'json',
+    agent,
+    headers: {'User-Agent': 'Testypie Tests'},
+  }).then(response => Object.keys(response.data).length);
 }
 
-
-var assert = require('assert');
-
 describe('Example', function() {
-  it('should measure length of responses', function() {
+  it('should measure length of HTTP responses', function() {
 
-    return exampleFunctionNeedingTesting()
+    return keyCounter('http://dbpedia.org/data/Elephant.json')
+      .then(function(length) {
+        assert.equal(length, 99);
+      });
+
+  });
+
+  it('should measure length of HTTPS responses', function() {
+
+    return keyCounter('https://reddit.com/r/python.json')
       .then(function(length) {
         assert.equal(length, 59754);
       });

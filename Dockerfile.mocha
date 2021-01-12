@@ -6,6 +6,6 @@ ADD test /code/test
 
 WORKDIR /code
 
-RUN npm install global-agent
+RUN npm install axios && npm ls
 
 CMD mocha test/*.js

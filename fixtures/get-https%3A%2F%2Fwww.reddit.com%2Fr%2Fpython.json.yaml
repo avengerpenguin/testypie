@@ -1,0 +1,6 @@
+body: |-
+  {"message": "Too Many Requests", "error": 429}
+code: 429
+headers:
+  Content-Type: application/json; charset=UTF-8
+  Server: snooserv
