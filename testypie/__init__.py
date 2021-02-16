@@ -38,7 +38,7 @@ def literal_presenter(dumper, data):
 yaml.add_representer(literal, literal_presenter)
 
 
-class Cache(object):
+class Cache:
     def __init__(self, basedir):
         self.basedir = basedir
 
@@ -63,7 +63,7 @@ class Cache(object):
     def __getitem__(self, item):
         filename = os.path.join(self.basedir, url_to_filename(item))
 
-        with open(filename, "r") as cache_file:
+        with open(filename) as cache_file:
             print(f"Writing to {filename}", file=sys.stderr)
             value = yaml.safe_load(cache_file)
 
@@ -102,7 +102,7 @@ HTTP = requests.Session()
 
 def get_response(url, headers, method="get", body=None):
 
-    cache_key = "{}-{}".format(method.upper(), url)
+    cache_key = f"{method.upper()}-{url}"
     if body:
         cache_key += "-" + hashlib.md5(body).hexdigest()
 
