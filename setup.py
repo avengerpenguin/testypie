@@ -1,4 +1,5 @@
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 setup(
     name="testypie",
@@ -18,7 +19,17 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
     ],
-    install_requires=["Flask", "requests", "httplib2", "PyYAML", "clize",],
+    install_requires=[
+        "Flask",
+        "requests",
+        "httplib2",
+        "PyYAML",
+        "clize",
+    ],
     setup_requires=["pytest-runner", "setuptools_scm>=3.3.1", "twine"],
-    entry_points={"console_scripts": ["testypie = testypie:cli",],},
+    entry_points={
+        "console_scripts": [
+            "testypie = testypie:cli",
+        ],
+    },
 )

@@ -50,8 +50,8 @@ that you follow the given workflow:
 * At any time, you can delete individual or all fixtures to "refresh" them
   (e.g. if the upstream API changes) -- no need to maintain manual mocks to
   keep them aligned with upstreams
-  
-  
+
+
 ## Use cases and motivation
 
 This project came out of writing tests for code in domains involving a lot of
@@ -70,7 +70,7 @@ to mock effectively. Examples of this are
 In the case of boto and AWS, testypie is useful in capturing exactly what boto
 and AWS do and replaying it rather than having to reverse engineer a fairly
 complex API so that you can mock it.
-  
+
 ## Fixture Format
 
 Fixtures are a model of the HTTP response (code, headers, body) serialised to
