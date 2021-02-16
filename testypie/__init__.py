@@ -6,9 +6,7 @@ import sys
 import requests
 import yaml
 from clize import run
-from flask import Flask
-from flask import Response
-from flask import request
+from flask import Flask, Response, request
 from httplib2 import iri2uri
 
 try:
