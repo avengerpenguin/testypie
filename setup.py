@@ -1,15 +1,17 @@
-from setuptools import find_packages, setup
+#!/usr/bin/env python
+from setuptools import setup
 
+NAME = "testypie"
 setup(
-    name="testypie",
+    name=NAME,
     use_scm_version={
         "local_scheme": "dirty-tag",
-        "write_to": "testypie/_version.py",
+        "write_to": f"{NAME}/_version.py",
         "fallback_version": "0.0.0",
     },
     author="Ross Fenning",
     author_email="github@rossfenning.co.uk",
-    packages=find_packages("testypie"),
+    packages=[NAME],
     url="https://github.com/avengerpenguin/testypie",
     description="HTTP proxy that generates and loads from fixtures for testing.",
     license="GPLv3+",
@@ -25,7 +27,10 @@ setup(
         "PyYAML",
         "clize",
     ],
-    setup_requires=["pytest-runner", "setuptools_scm>=3.3.1", "twine"],
+    setup_requires=[
+        "setuptools_scm>=3.3.1",
+        "pre-commit",
+    ],
     entry_points={
         "console_scripts": [
             "testypie = testypie:cli",
