@@ -2,18 +2,13 @@ import hashlib
 import logging
 import os
 import sys
+from urllib.parse import quote
 
 import requests
 import yaml
 from clize import run
 from flask import Flask, Response, request
 from httplib2 import iri2uri
-
-try:
-    from urllib.parse import quote
-except ImportError:
-    from urllib import quote
-
 
 app = Flask(__name__)
 
