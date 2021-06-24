@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import sys
+from typing import Dict
 from urllib.parse import quote
 
 import requests
@@ -9,6 +10,7 @@ import yaml
 from clize import run
 from flask import Flask, Response, request
 from httplib2 import iri2uri
+from werkzeug.datastructures import EnvironHeaders
 
 app = Flask(__name__)
 
@@ -73,7 +75,7 @@ def create_incoming_headers(upstream_response):
     return server_headers
 
 
-def create_outgoing_headers(headers):
+def create_outgoing_headers(headers: EnvironHeaders):
     client_headers = {}
     for wanted_header in {
         "Accept",
@@ -93,11 +95,13 @@ CACHE = Cache(BASEDIR)
 HTTP = requests.Session()
 
 
-def get_response(url, headers, method="get", body=None):
+def get_response(
+    url: str, headers: EnvironHeaders, method: str = "get", body: str = None
+) -> Dict:
 
     cache_key = f"{method.upper()}-{url}"
     if body:
-        cache_key += "-" + hashlib.md5(body).hexdigest()
+        cache_key += "-" + hashlib.md5(body.encode("utf-8")).hexdigest()
 
     if cache_key not in CACHE:
         # Use requests to fetch the upstream URL the client wants
@@ -119,7 +123,7 @@ def get_response(url, headers, method="get", body=None):
         )
 
         if body:
-            response["request_body"] = body.decode("utf-8")
+            response["request_body"] = body.encode("utf-8")
 
         CACHE[cache_key] = response
 
@@ -128,7 +132,7 @@ def get_response(url, headers, method="get", body=None):
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def proxy(path):
+def proxy(_path: str) -> Response:
     response = get_response(
         request.url, request.headers, method=request.method
     )

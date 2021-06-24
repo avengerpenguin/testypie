@@ -5,3 +5,4 @@
 /dist
 *~
 /venv
+/testypie/_version.py
