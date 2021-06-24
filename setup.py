@@ -12,6 +12,7 @@ setup(
     author="Ross Fenning",
     author_email="github@rossfenning.co.uk",
     packages=[NAME],
+    package_data={NAME: ["py.typed"]},
     url="https://github.com/avengerpenguin/testypie",
     description="HTTP proxy that generates and loads from fixtures for testing.",
     license="GPLv3+",
