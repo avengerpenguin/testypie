@@ -31,6 +31,17 @@ setup(
         "setuptools_scm>=3.3.1",
         "pre-commit",
     ],
+    extras_require={
+        "test": [
+            "pytest",
+            "pytest-mypy",
+            "pytest-pikachu",
+            "types-requests",
+            "types-Flask",
+            "types-PyYAML",
+            "types-Werkzeug",
+        ],
+    },
     entry_points={
         "console_scripts": [
             "testypie = testypie:cli",
