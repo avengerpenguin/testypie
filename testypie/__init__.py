@@ -98,7 +98,6 @@ HTTP = requests.Session()
 def get_response(
     url: str, headers: EnvironHeaders, method: str = "get", body: str = None
 ) -> Dict:
-
     cache_key = f"{method.upper()}-{url}"
     if body:
         cache_key += "-" + hashlib.md5(body.encode("utf-8")).hexdigest()
