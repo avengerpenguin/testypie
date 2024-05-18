@@ -38,19 +38,18 @@ $ run-my-tests.sh # e.g. mocha mytests.js or pytest mytests.py
 Whether used as a proxy or as an intercept within Python tests, the idea is
 that you follow the given workflow:
 
-* Write unit tests that exercise your code without even attempting to mock
-* Your code will result in an HTTP request that is allowed to happen over the
+- Write unit tests that exercise your code without even attempting to mock
+- Your code will result in an HTTP request that is allowed to happen over the
   real network _on first run only_
-* A realistic fixture from this real request is stored in `$PWD/fixtures`
-* On the next test run, testypie will respond with the fixture on disk rather
+- A realistic fixture from this real request is stored in `$PWD/fixtures`
+- On the next test run, testypie will respond with the fixture on disk rather
   than allow the real request to happen
-* Now your tests work fine offline
-* You are free to modify fixtures (see fixture format below) to make it replay
+- Now your tests work fine offline
+- You are free to modify fixtures (see fixture format below) to make it replay
   an altered or stub version of the response
-* At any time, you can delete individual or all fixtures to "refresh" them
+- At any time, you can delete individual or all fixtures to "refresh" them
   (e.g. if the upstream API changes) -- no need to maintain manual mocks to
   keep them aligned with upstreams
-
 
 ## Use cases and motivation
 
@@ -87,7 +86,6 @@ form of the URL that was fetched. This both allows for different responses for
 different methods (e.g. PUT vs. DELETE) and also keeps the file names
 understandable enough such that it would be possible to generate fixtures up
 front with a script (or manually).
-
 
 ## Limitations
 
